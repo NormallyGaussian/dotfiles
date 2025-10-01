@@ -1,6 +1,6 @@
 # Neovim Configuration
 
-A complete Neovim setup with LSP support for Python, Rust, and Java, along with file navigation, fuzzy finding, and modern UI.
+A complete Neovim setup with LSP support for Lua, Python, Rust, and Java, along with terminal integration, diagnostics, git integration, file navigation, fuzzy finding, and modern UI.
 
 ## Features
 
@@ -8,8 +8,14 @@ A complete Neovim setup with LSP support for Python, Rust, and Java, along with 
 - 📁 **File Explorer** - nvim-tree for easy file navigation
 - 🔍 **Fuzzy Finder** - Telescope for quick file/text search
 - 🌳 **Treesitter** - Enhanced syntax highlighting
-- 🔧 **LSP Support** - Language servers for Python, Rust, and Java
+- 🔧 **LSP Support** - Language servers for Lua, Python, Rust, and Java
 - ✨ **Autocompletion** - Intelligent code completion with nvim-cmp
+- 🖥️ **Terminal Integration** - toggleterm for easy terminal access
+- 🐛 **Diagnostics** - Trouble.nvim for better error/warning display
+- 🎯 **Flash Navigation** - Quick cursor movement with flash.nvim
+- 🎨 **Code Formatting** - Automatic formatting with conform.nvim
+- 🔀 **Git Integration** - GitSigns for git hunks and blame
+- ⌨️ **Which-Key** - On-screen keybinding help
 - ⚡ **Fast** - Optimized for performance with lazy.nvim
 
 ## Prerequisites
@@ -74,6 +80,8 @@ Leader key is set to `Space`.
 - `Space + w` - Save file
 - `Space + q` - Quit
 - `Ctrl + h/j/k/l` - Navigate between windows
+- `Shift + h/l` - Previous/Next buffer
+- `Space + bd` - Delete buffer
 
 ### File Explorer (nvim-tree)
 - `Space + e` - Toggle file tree
@@ -115,6 +123,39 @@ Leader key is set to `Space`.
 - `Shift + Tab` - Previous suggestion
 - `Enter` - Accept suggestion
 - `Ctrl + Space` - Trigger completion
+
+### Terminal
+- `Ctrl + \` - Toggle terminal (horizontal split at bottom)
+- `Esc` or `jk` - Exit terminal insert mode
+- `Ctrl + h/j/k/l` - Navigate to other windows from terminal
+
+### Diagnostics (Trouble)
+- `Space + xx` - Toggle diagnostics panel
+- `Space + xX` - Toggle buffer diagnostics
+- `Space + cs` - Toggle symbols
+- `Space + cl` - Toggle LSP definitions
+
+### Git (GitSigns)
+- `]c` - Next git hunk
+- `[c` - Previous git hunk
+- `Space + hs` - Stage hunk
+- `Space + hr` - Reset hunk
+- `Space + hp` - Preview hunk
+- `Space + hb` - Blame line
+- `Space + hd` - Diff this
+
+### Flash Navigation
+- `s` - Jump to location (flash)
+- `S` - Jump to treesitter node
+- `r` - Remote flash (in operator mode)
+- `R` - Treesitter search
+
+### Code Formatting
+- `Space + mp` - Format file or selection (in visual mode)
+
+### Command-line
+- `Tab` - Show autocomplete suggestions
+- `Ctrl + n/p` or `Tab/Shift+Tab` - Navigate suggestions
 
 ## Recommended Dotfiles Structure
 
@@ -177,6 +218,12 @@ lspconfig.tsserver.setup({ on_attach = on_attach })
 - Run `:Mason` to check language server installation
 - Ensure the programming language is installed on your system
 - Check `:LspInfo` for active language servers
+- Run `:LspRestart` to restart the language server
+
+### Diagnostics/Warnings
+- Press `K` on a line to see diagnostic details
+- Use `Space + xx` to open the Trouble diagnostics panel
+- Use `[d` and `]d` to navigate between diagnostics
 
 ### Icons not showing
 - Install a [Nerd Font](https://www.nerdfonts.com/)
