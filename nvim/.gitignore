@@ -1,0 +1,27 @@
+# Neovim gitignore
+# Add this to ~/.config/nvim/.gitignore
+
+# Plugin directory (managed by lazy.nvim)
+plugin/
+
+# Lazy.nvim data directory
+lazy-lock.json
+
+# Undo history
+*.un~
+
+# Swap files
+*.swp
+*.swo
+*~
+
+# Session files
+Session.vim
+.session
+
+# Temporary files
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
