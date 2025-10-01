@@ -35,6 +35,11 @@ vim.opt.scrolloff = 8 -- Keep 8 lines visible when scrolling
 vim.opt.signcolumn = "yes" -- Always show sign column
 vim.opt.updatetime = 50 -- Faster completion
 
+-- Command-line completion
+vim.opt.wildmenu = true -- Enable command-line completion menu
+vim.opt.wildmode = "longest:full,full" -- Command-line completion mode
+vim.opt.wildoptions = "pum" -- Show completion in popup menu
+
 -- Setup plugins
 require("lazy").setup({
 	-- Nightfox colorscheme
@@ -420,17 +425,9 @@ require("lazy").setup({
 				start_in_insert = true,
 				insert_mappings = true,
 				persist_size = true,
-				direction = "float",
+				direction = "horizontal",
 				close_on_exit = true,
 				shell = vim.o.shell,
-				float_opts = {
-					border = "curved",
-					winblend = 0,
-					highlights = {
-						border = "Normal",
-						background = "Normal",
-					},
-				},
 			})
 		end,
 	},
