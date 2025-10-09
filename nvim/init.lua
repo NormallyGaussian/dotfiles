@@ -554,6 +554,9 @@ end, { desc = "Format file or range (in visual mode)" })
 vim.keymap.set("n", "<leader>w", ":w<CR>", { silent = true, desc = "Save file" })
 vim.keymap.set("n", "<leader>q", ":q<CR>", { silent = true, desc = "Quit" })
 
+-- Terminal toggle
+vim.keymap.set("n", "<leader>t", ":ToggleTerm<CR>", { silent = true, desc = "Toggle terminal" })
+
 -- Terminal keymaps
 vim.api.nvim_create_autocmd("TermOpen", {
 	pattern = "term://*",

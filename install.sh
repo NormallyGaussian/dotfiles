@@ -1,5 +1,5 @@
 #!/bin/bash
-# Neovim configuration installation script with symlink support
+# Neovim configuration installation script
 
 set -e
 
@@ -17,47 +17,73 @@ NVIM_CONFIG="$HOME/.config/nvim"
 
 echo "📁 Dotfiles location: $SCRIPT_DIR"
 
-# Check if Neovim is installed
+# Install Neovim if not already installed
 if ! command -v nvim &> /dev/null; then
-    echo -e "${RED}Error: Neovim is not installed.${NC}"
-    echo "Please install Neovim first:"
-    echo "  macOS: brew install neovim"
-    echo "  Ubuntu/Debian: sudo apt install neovim"
-    echo "  Arch: sudo pacman -S neovim"
-    exit 1
+    echo -e "${YELLOW}Neovim is not installed. Installing...${NC}"
+
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        if command -v brew &> /dev/null; then
+            echo "Installing Neovim via Homebrew..."
+            brew install neovim
+        else
+            echo -e "${RED}Error: Homebrew is not installed.${NC}"
+            echo "Please install Homebrew first: https://brew.sh"
+            exit 1
+        fi
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # Linux
+        if command -v apt-get &> /dev/null; then
+            echo "Installing Neovim via apt..."
+            sudo apt-get update
+            sudo apt-get install -y neovim
+        elif command -v dnf &> /dev/null; then
+            echo "Installing Neovim via dnf..."
+            sudo dnf install -y neovim
+        elif command -v pacman &> /dev/null; then
+            echo "Installing Neovim via pacman..."
+            sudo pacman -S --noconfirm neovim
+        else
+            echo -e "${RED}Error: Could not detect package manager.${NC}"
+            echo "Please install Neovim manually and run this script again."
+            exit 1
+        fi
+    else
+        echo -e "${RED}Error: Unsupported operating system.${NC}"
+        exit 1
+    fi
+
+    echo -e "${GREEN}✓ Neovim installed successfully${NC}"
 fi
 
 # Check Neovim version
-NVIM_VERSION=$(nvim --version | head -n 1 | grep -oP '\d+\.\d+' | head -n 1)
+NVIM_VERSION=$(nvim --version | head -n 1 | sed -E 's/.*v([0-9]+\.[0-9]+).*/\1/')
 echo "📦 Found Neovim version: $NVIM_VERSION"
 
 # Backup existing config
-if [ -e "$NVIM_CONFIG" ] && [ ! -L "$NVIM_CONFIG" ]; then
+if [ -e "$NVIM_CONFIG" ]; then
     BACKUP_DIR="$HOME/.config/nvim.backup.$(date +%Y%m%d_%H%M%S)"
     echo -e "${YELLOW}⚠️  Existing config found. Backing up to: $BACKUP_DIR${NC}"
     mv "$NVIM_CONFIG" "$BACKUP_DIR"
-elif [ -L "$NVIM_CONFIG" ]; then
-    echo -e "${YELLOW}⚠️  Symlink already exists. Removing old symlink...${NC}"
-    rm "$NVIM_CONFIG"
 fi
 
 # Create parent directory if it doesn't exist
 mkdir -p "$HOME/.config"
 
-# Create symlink
+# Copy config files
 if [ -d "$SCRIPT_DIR/nvim" ]; then
     # If there's a nvim subdirectory in the dotfiles
-    echo "🔗 Creating symlink: $NVIM_CONFIG -> $SCRIPT_DIR/nvim"
-    ln -s "$SCRIPT_DIR/nvim" "$NVIM_CONFIG"
+    echo "📋 Copying config: $SCRIPT_DIR/nvim -> $NVIM_CONFIG"
+    cp -r "$SCRIPT_DIR/nvim" "$NVIM_CONFIG"
 elif [ -f "$SCRIPT_DIR/init.lua" ]; then
     # If init.lua is in the root of dotfiles
-    echo "🔗 Creating directory and symlinking init.lua..."
+    echo "📋 Creating directory and copying init.lua..."
     mkdir -p "$NVIM_CONFIG"
-    ln -s "$SCRIPT_DIR/init.lua" "$NVIM_CONFIG/init.lua"
-    
-    # Symlink .gitignore if it exists
+    cp "$SCRIPT_DIR/init.lua" "$NVIM_CONFIG/init.lua"
+
+    # Copy .gitignore if it exists
     if [ -f "$SCRIPT_DIR/.gitignore" ]; then
-        ln -s "$SCRIPT_DIR/.gitignore" "$NVIM_CONFIG/.gitignore"
+        cp "$SCRIPT_DIR/.gitignore" "$NVIM_CONFIG/.gitignore"
     fi
 else
     echo -e "${RED}Error: Could not find nvim directory or init.lua${NC}"
@@ -65,7 +91,7 @@ else
     exit 1
 fi
 
-echo -e "${GREEN}✓ Symlinks created successfully${NC}"
+echo -e "${GREEN}✓ Config files copied successfully${NC}"
 
 # Check for git (required by lazy.nvim)
 if ! command -v git &> /dev/null; then
@@ -74,11 +100,9 @@ if ! command -v git &> /dev/null; then
     exit 1
 fi
 
-# Verify symlink
-if [ -L "$NVIM_CONFIG" ]; then
-    echo -e "${GREEN}✓ Symlink verified: $(readlink $NVIM_CONFIG)${NC}"
-elif [ -L "$NVIM_CONFIG/init.lua" ]; then
-    echo -e "${GREEN}✓ Symlink verified: $(readlink $NVIM_CONFIG/init.lua)${NC}"
+# Verify installation
+if [ -f "$NVIM_CONFIG/init.lua" ]; then
+    echo -e "${GREEN}✓ Config files verified${NC}"
 fi
 
 echo ""
@@ -119,5 +143,5 @@ fi
 echo ""
 echo -e "${GREEN}🎉 Setup complete! Launch nvim to get started.${NC}"
 echo ""
-echo "ℹ️  Your config is now symlinked. Any changes you make to the files"
-echo "   in $SCRIPT_DIR will automatically apply to Neovim."
+echo "ℹ️  Your config has been copied to ~/.config/nvim"
+echo "   To update, run this script again or edit files directly in ~/.config/nvim"
