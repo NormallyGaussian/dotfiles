@@ -98,7 +98,7 @@ require("lazy").setup({
 		build = ":TSUpdate",
 		config = function()
 			require("nvim-treesitter.configs").setup({
-				ensure_installed = { "lua", "vim", "vimdoc", "python", "rust", "java", "javascript", "typescript" },
+				ensure_installed = { "lua", "vim", "vimdoc", "python", "rust", "java", "javascript", "typescript", "c", "cpp" },
 				sync_install = false,
 				auto_install = true,
 				ignore_install = {},
@@ -124,6 +124,7 @@ require("lazy").setup({
 					"pyright", -- Python
 					"rust_analyzer", -- Rust
 					"jdtls", -- Java
+					"clangd", -- C/C++
 				},
 				automatic_installation = true,
 			})
@@ -194,11 +195,18 @@ require("lazy").setup({
 				root_markers = { "pom.xml", "build.gradle", ".git" },
 			})
 
+			vim.lsp.config("clangd", {
+				cmd = { "clangd" },
+				filetypes = { "c", "cpp", "objc", "objcpp" },
+				root_markers = { "compile_commands.json", ".git" },
+			})
+
 			-- Enable the language servers
 			vim.lsp.enable("lua_ls")
 			vim.lsp.enable("pyright")
 			vim.lsp.enable("rust_analyzer")
 			vim.lsp.enable("jdtls")
+			vim.lsp.enable("clangd")
 		end,
 	},
 
