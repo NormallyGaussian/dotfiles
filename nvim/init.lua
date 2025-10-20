@@ -490,6 +490,107 @@ require("lazy").setup({
 			})
 		end,
 	},
+
+	-- Debug Adapter Protocol (DAP)
+	{
+		"mfussenegger/nvim-dap",
+		dependencies = {
+			"rcarriga/nvim-dap-ui",
+			"nvim-neotest/nvim-nio",
+			"jay-babu/mason-nvim-dap.nvim",
+			"theHamsta/nvim-dap-virtual-text",
+		},
+		config = function()
+			local dap = require("dap")
+			local dapui = require("dapui")
+
+			-- Setup mason-nvim-dap to auto-install debuggers
+			require("mason-nvim-dap").setup({
+				ensure_installed = { "codelldb" },
+				automatic_installation = true,
+				handlers = {},
+			})
+
+			-- Setup DAP UI
+			dapui.setup({
+				layouts = {
+					{
+						elements = {
+							{ id = "scopes", size = 0.25 },
+							{ id = "breakpoints", size = 0.25 },
+							{ id = "stacks", size = 0.25 },
+							{ id = "watches", size = 0.25 },
+						},
+						size = 40,
+						position = "left",
+					},
+					{
+						elements = {
+							{ id = "repl", size = 0.5 },
+							{ id = "console", size = 0.5 },
+						},
+						size = 10,
+						position = "bottom",
+					},
+				},
+			})
+
+			-- Setup virtual text (shows variable values inline)
+			require("nvim-dap-virtual-text").setup({
+				enabled = true,
+				enabled_commands = true,
+				highlight_changed_variables = true,
+				highlight_new_as_changed = false,
+				show_stop_reason = true,
+				commented = false,
+			})
+
+			-- Automatically open/close DAP UI
+			dap.listeners.after.event_initialized["dapui_config"] = function()
+				dapui.open()
+			end
+			dap.listeners.before.event_terminated["dapui_config"] = function()
+				dapui.close()
+			end
+			dap.listeners.before.event_exited["dapui_config"] = function()
+				dapui.close()
+			end
+
+			-- C/C++ debugger configuration using codelldb
+			dap.adapters.codelldb = {
+				type = "server",
+				port = "${port}",
+				executable = {
+					command = vim.fn.stdpath("data") .. "/mason/bin/codelldb",
+					args = { "--port", "${port}" },
+				},
+			}
+
+			dap.configurations.cpp = {
+				{
+					name = "Launch file",
+					type = "codelldb",
+					request = "launch",
+					program = function()
+						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+					end,
+					cwd = "${workspaceFolder}",
+					stopOnEntry = false,
+					args = {},
+				},
+				{
+					name = "Attach to process",
+					type = "codelldb",
+					request = "attach",
+					pid = require("dap.utils").pick_process,
+					args = {},
+				},
+			}
+
+			-- C uses the same configuration as C++
+			dap.configurations.c = dap.configurations.cpp
+		end,
+	},
 })
 
 -- Keybindings
@@ -578,3 +679,35 @@ vim.api.nvim_create_autocmd("TermOpen", {
 		vim.keymap.set("t", "<C-l>", [[<Cmd>wincmd l<CR>]], opts)
 	end,
 })
+
+-- Debugger keymaps
+vim.keymap.set("n", "<leader>db", function()
+	require("dap").toggle_breakpoint()
+end, { silent = true, desc = "Toggle breakpoint" })
+vim.keymap.set("n", "<leader>dc", function()
+	require("dap").continue()
+end, { silent = true, desc = "Debug: Continue" })
+vim.keymap.set("n", "<leader>di", function()
+	require("dap").step_into()
+end, { silent = true, desc = "Debug: Step into" })
+vim.keymap.set("n", "<leader>do", function()
+	require("dap").step_over()
+end, { silent = true, desc = "Debug: Step over" })
+vim.keymap.set("n", "<leader>dO", function()
+	require("dap").step_out()
+end, { silent = true, desc = "Debug: Step out" })
+vim.keymap.set("n", "<leader>dr", function()
+	require("dap").repl.toggle()
+end, { silent = true, desc = "Debug: Toggle REPL" })
+vim.keymap.set("n", "<leader>dl", function()
+	require("dap").run_last()
+end, { silent = true, desc = "Debug: Run last" })
+vim.keymap.set("n", "<leader>du", function()
+	require("dapui").toggle()
+end, { silent = true, desc = "Debug: Toggle UI" })
+vim.keymap.set("n", "<leader>dt", function()
+	require("dap").terminate()
+end, { silent = true, desc = "Debug: Terminate" })
+vim.keymap.set("n", "<leader>dh", function()
+	require("dap.ui.widgets").hover()
+end, { silent = true, desc = "Debug: Hover" })
