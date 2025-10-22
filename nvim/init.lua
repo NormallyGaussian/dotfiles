@@ -21,6 +21,8 @@ vim.g.maplocalleader = " "
 
 -- Basic settings
 vim.opt.number = true -- Show line numbers
+vim.opt.cursorline = true -- Highlight current line
+vim.opt.cursorlineopt = "number" -- Only highlight the line number, not the entire line
 vim.opt.mouse = "a" -- Enable mouse support
 vim.opt.ignorecase = true -- Case insensitive search
 vim.opt.smartcase = true -- Unless you use capitals
